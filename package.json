@@ -1,0 +1,38 @@
+{
+    "name": "learnix-ai-learning-marketplace",
+    "version": "1.0.0",
+    "private": true,
+    "description": "AI-powered Learning Marketplace - Monorepo",
+    "workspaces": [
+        "apps/*"
+    ],
+    "scripts": {
+        "dev": "concurrently \"npm run dev --workspace=@ai-learning-marketplace/api\" \"npm run dev --workspace=@ai-learning-marketplace/web\"",
+        "dev:api": "npm run dev --workspace=@ai-learning-marketplace/api",
+        "dev:web": "npm run dev --workspace=@ai-learning-marketplace/web",
+        "build": "npm run build --workspace=@ai-learning-marketplace/api && npm run build --workspace=@ai-learning-marketplace/web",
+        "start": "npm run start --workspace=@ai-learning-marketplace/api",
+        "test": "npm test",
+        "lint": "npm run lint --workspace=@ai-learning-marketplace/api && npm run lint --workspace=@ai-learning-marketplace/web",
+        "docker:up": "docker-compose up -d",
+        "docker:down": "docker-compose down",
+        "docker:build": "docker-compose build"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    },
+    "keywords": [
+        "ai",
+        "learning",
+        "marketplace",
+        "react",
+        "nodejs",
+        "express",
+        "mongodb"
+    ],
+    "author": "Shukal Soni",
+    "license": "MIT"
+}

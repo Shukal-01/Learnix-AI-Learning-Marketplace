@@ -1,0 +1,63 @@
+services:
+  mongo:
+    image: mongo:6
+    container_name: learnix-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: learnix
+    healthcheck:
+      test: echo 'db.runCommand({ping:1})' | mongosh -u root -p example --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: learnix-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      PORT: 4000
+      MONGODB_URI: mongodb://root:example@mongo:27017/learnix?authSource=admin
+      JWT_SECRET: your_jwt_secret_here
+      JWT_EXPIRES_IN: 15d
+      JWT_REFRESH_EXPIRES_IN: 30d
+      FRONTEND_URL: http://localhost:3000
+    volumes:
+      - ./apps/api:/app
+      - /app/node_modules
+    command: npm run dev
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: learnix-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+    environment:
+      VITE_API_URL: http://localhost:4000/api
+      VITE_SOCKET_URL: http://localhost:4000
+    volumes:
+      - ./apps/web:/app
+      - /app/node_modules
+    command: npm run dev
+
+volumes:
+  mongo_data:
